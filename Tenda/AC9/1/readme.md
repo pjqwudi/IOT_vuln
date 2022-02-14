@@ -11,7 +11,13 @@
 
 Figure 1 shows the latest firmware Ba of the router
 
-## 2. Recurring vulnerabilities and POC
+## Vulnerability details
+
+Formsetqosband function dest copies the matched content to the stack through regular expression without judging the size, resulting in stack overflow vulnerability. In fact, the parameters of NPTR, V12, V10 and V11 are controllable, and there are stack overflow vulnerabilities
+
+![image-20220214122301080](img/image-20220214122301080.png)
+
+## Recurring vulnerabilities and POC
 
 In order to reproduce the vulnerability, the following steps can be followed:
 
@@ -39,3 +45,8 @@ netControlEn=1&list=;0;9c:fc:e8:1a:33:80aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaa
 The reproduction results are as follows:
 
 ![image-20220214114614959](img/image-20220214114614959.png)
+
+Figure 2 POC attack effect
+
+Finally, you can write exp, which can achieve a very stable effect of obtaining the root shell
+
