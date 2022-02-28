@@ -1,4 +1,4 @@
-# Tenda AC9 V15.03.2.21_cn Unauthorized stack overflow vulnerability
+# Tenda AC6 V15.03.05.09_multi Unauthorized stack overflow vulnerability
 
 ## Overview
 
