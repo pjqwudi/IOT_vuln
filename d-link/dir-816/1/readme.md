@@ -21,7 +21,7 @@ The content obtained by the program through admuser and admpass parameters is pa
 
 In order to reproduce the vulnerability, the following steps can be followed:
 
-1. Use the fat simulation firmware DIR882A1_FW130B06.bin
+1. Use the fat simulation firmware DIR-816 A2_v1.10CNB04.img
 2. Attack with the following POC attacks
 
 ```
